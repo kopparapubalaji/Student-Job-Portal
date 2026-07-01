@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error - Job Portal</title>
+    <link rel="stylesheet" th:href="@{/css/modern.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-light);
+            padding: 20px;
+        }
+        .error-card {
+            background: var(--white);
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .error-card h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #dc3545;
+            font-size: 1.8rem;
+        }
+        .error-card p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.5;
+            word-break: break-word;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed var(--border-color);
+        }
+        .error-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-card">
+            <div class="error-icon">⚠️</div>
+            <h2>Something went wrong!</h2>
+            <p th:text="${errorMessage}">An unexpected error occurred.</p>
+            <a href="/" class="btn-pill btn-register" style="display: inline-block;">Return to Home</a>
+        </div>
+    </div>
+</body>
+</html>

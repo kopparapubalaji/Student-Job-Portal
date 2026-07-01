@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Profile - Job Portal</title>
+    <link rel="stylesheet" th:href="@{/css/modern.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 60px auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .form-group input[type="text"], 
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input[type="text"]:focus, 
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+        }
+        .form-group input[type="file"] {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+        .btn-update {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+        .btn-update:hover {
+            background: var(--primary-hover);
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="nav-logo">JobPortal</a>
+        
+        <label for="menu-toggle" class="menu-toggle-btn">&#9776;</label>
+        <input type="checkbox" id="menu-toggle">
+
+        <div class="nav-wrapper">
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a th:href="@{/student/dashboard}">Dashboard</a>
+                <a th:href="@{/student/profile}" style="color: var(--primary-color);">My Profile</a>
+            </div>
+            <div class="nav-buttons">
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-pill btn-login" style="padding: 10px 25px;">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PROFILE CONTENT -->
+    <div class="profile-container">
+        
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <span th:text="${user.name != null ? #strings.substring(user.name,0,1) : 'S'}">S</span>
+            </div>
+            <div>
+                <h2 style="margin: 0 0 5px 0; color: var(--text-color);" th:text="${user.name}">Student Name</h2>
+                <p style="margin: 0; color: var(--text-muted);" th:text="${user.email}">student@example.com</p>
+            </div>
+        </div>
+
+        <div th:if="${param.success}" class="alert">
+            ✓ Profile updated successfully!
+        </div>
+
+        <form th:action="@{/student/profile/update}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" th:value="${user.name}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Skills (Comma-separated, e.g. Java, SQL, HTML)</label>
+                <input type="text" name="skills" th:value="${user.skills}" placeholder="e.g. Java, Python, React">
+                <small style="color: var(--text-muted); display: block; margin-top: 5px;">These skills power your Match Score on the dashboard.</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Professional Summary (About Me)</label>
+                <textarea name="profileDescription" rows="5" placeholder="Tell employers about your experience and goals..." th:text="${user.profileDescription}"></textarea>
+            </div>
+            
+            <div class="form-group" style="background: var(--bg-light); padding: 20px; border-radius: 8px; border: 1px dashed var(--border-color);">
+                <label style="margin-bottom: 0;">Upload Resume (PDF/DOCX)</label>
+                <p th:if="${user.resumePath}" style="font-size: 0.9rem; color: var(--text-muted); margin: 5px 0 15px 0;">
+                    Current Resume: <strong th:text="${user.resumePath}" style="color: var(--primary-color);"></strong>
+                </p>
+                <input type="file" name="resume">
+            </div>
+            
+            <button type="submit" class="btn-update">Save Profile Changes</button>
+        </form>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" style="margin-top: 60px;">
+        <div class="footer-bottom" style="border-top: none;">
+            &copy; 2026 JobPortal. All Rights Reserved.
+        </div>
+    </footer>
+</body>
+</html>

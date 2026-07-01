@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employer Dashboard - Job Portal</title>
+    <link rel="stylesheet" th:href="@{/css/modern.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .table-container {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        tr:hover {
+            background-color: rgba(40, 167, 69, 0.03);
+        }
+        .btn-action {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-blue { background: #e7f1ff; color: #0d6efd; border: 1px solid #0d6efd; }
+        .btn-blue:hover { background: #0d6efd; color: #fff; }
+        .btn-yellow { background: #fff3cd; color: #ffc107; border: 1px solid #ffc107; }
+        .btn-yellow:hover { background: #ffc107; color: #000; }
+        .btn-red { background: #f8d7da; color: #dc3545; border: 1px solid #dc3545; }
+        .btn-red:hover { background: #dc3545; color: #fff; }
+        
+        .stat-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="nav-logo">JobPortal Employer</a>
+        
+        <label for="menu-toggle" class="menu-toggle-btn">&#9776;</label>
+        <input type="checkbox" id="menu-toggle">
+
+        <div class="nav-wrapper">
+            <div class="nav-links">
+                <a th:href="@{/employer/dashboard}" style="color: var(--primary-color);">Dashboard</a>
+                <a th:href="@{/employer/jobs/new}">Post New Job</a>
+            </div>
+            <div class="nav-buttons">
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn-pill btn-login" style="padding: 10px 25px;">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1400px; margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px;">
+            <h2 class="section-title" style="margin: 0;">Dashboard Overview</h2>
+            <a th:href="@{/employer/jobs/new}" class="btn-pill btn-register">Post New Job</a>
+        </div>
+
+        <div th:if="${param.posted}" class="alert" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">✓ Job posted successfully!</div>
+        <div th:if="${param.updated}" class="alert" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">✓ Job updated successfully!</div>
+        <div th:if="${param.deleted}" class="alert" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">✓ Job deleted successfully!</div>
+
+        <!-- Notifications & Analytics Layout -->
+        <div class="dashboard-layout" style="grid-template-columns: 1fr 2.5fr;">
+            
+            <!-- Left Sidebar -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <!-- Stat Cards -->
+                <div class="stat-card">
+                    <h3 style="font-size: 3.5rem; margin: 0; color: var(--primary-color);" th:text="${#lists.size(jobs)}">0</h3>
+                    <p style="margin: 0; font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">Total Active Jobs</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, var(--primary-color), #1e7e34); color: white; border: none;">
+                    <h3 style="font-size: 1.8rem; margin: 0 0 10px 0;">Hire Top Talent</h3>
+                    <p style="margin: 0; opacity: 0.9;">Review your applications and find the perfect match for your company.</p>
+                </div>
+
+                <!-- Notifications -->
+                <div style="background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);">
+                    <h3 style="margin-top: 0; color: var(--text-color);">🔔 Notifications</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto;">
+                        <li th:if="${#lists.isEmpty(notifications)}" style="color: var(--text-muted);">No new notifications.</li>
+                        <li th:each="note : ${notifications}" style="padding: 12px 0; border-bottom: 1px solid var(--border-color);">
+                            <span th:text="${note.message}" th:style="${note.read ? 'color: var(--text-muted);' : 'color: var(--text-color); font-weight: 600;'}"></span>
+                            <small style="display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;" th:text="${#temporals.format(note.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div>
+                <!-- Analytics Chart -->
+                <div style="background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 30px;">
+                    <h3 style="margin-top: 0;">Job Postings Analytics</h3>
+                    <canvas id="employerChart" height="100"></canvas>
+                </div>
+
+                <!-- Jobs Table -->
+                <h3 class="section-title" style="margin-bottom: 15px; font-size: 1.5rem;">My Job Postings</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Location</th>
+                                <th>Posted Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="job : ${jobs}">
+                                <td style="font-weight: 600;" th:text="${job.title}">Title</td>
+                                <td th:text="${job.location}">Location</td>
+                                <td th:text="${#temporals.format(job.postedDate, 'dd-MM-yyyy')}">Date</td>
+                                <td>
+                                    <div style="display: flex; gap: 8px;">
+                                        <a th:href="@{/employer/jobs/applicants/{id}(id=${job.id})}" class="btn-action btn-blue">Applicants</a>
+                                        <a th:href="@{'/employer/jobs/edit/' + ${job.id}}" class="btn-action btn-yellow">Edit</a>
+                                        <a th:href="@{'/employer/jobs/delete/' + ${job.id}}" class="btn-action btn-red" onclick="return confirm('Delete this job?')">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(jobs)}">
+                                <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-muted);">No jobs posted yet. Click 'Post New Job' to get started!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Chart.js Script (Updated Colors) -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var jobs = /*[[${jobs}]]*/ [];
+        
+        var categoryCounts = {};
+        jobs.forEach(function(job) {
+            var cat = job.category || 'General';
+            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+        });
+
+        var ctx = document.getElementById('employerChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(categoryCounts).length > 0 ? Object.keys(categoryCounts) : ['No Jobs'],
+                datasets: [{
+                    label: 'Jobs by Category',
+                    data: Object.keys(categoryCounts).length > 0 ? Object.values(categoryCounts) : [0],
+                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { color: '#333' } }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { stepSize: 1, color: '#666' },
+                        grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                        ticks: { color: '#666' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>
