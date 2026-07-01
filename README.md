@@ -190,8 +190,52 @@ Database includes tables for:
 
 # 📸 Screenshots
 
-> Add screenshots inside a **screenshots/** folder.
 
+## 🏠 Home Page
+
+<p align="center">
+<img src="homePage.png" width="100%">
+</p>
+
+---
+
+## 🔐 Login Page
+
+<p align="center">
+<img src="loginPage.png" width="100%">
+</p>
+
+---
+
+## 👨‍🎓 Student Dashboard
+
+<p align="center">
+<img src="dashBoard.png" width="100%">
+</p>
+
+---
+
+## 💼 Recruiter Dashboard
+
+<p align="center">
+<img src="employerPage.png" width="100%">
+</p>
+
+---
+
+## 📋 Job Listings
+
+<p align="center">
+<img src="jobSearch.png" width="100%">
+</p>
+
+---
+
+## 👨‍💼 Admin Dashboard
+
+<p align="center">
+<img src="Admin page.png" width="100%">
+</p>
 Example:
 
 - Login Page
